@@ -35,6 +35,34 @@ public:
         return *this;
     }
 
+    uint8_t read() const {
+        char value;
+        //set_es_segment(segment);
+        asm volatile (
+            "pushw %%ds \n"                // Save the 16-bit DS register on the stack
+            "mov %1, %%ax \n"              // Move segment into AX
+            "mov %%ax, %%ds \n"            // Set DS to the segment
+            "movw %2, %%si \n"             // Load offset into SI
+            "movb %%ds:(%%si), %%al \n"    // Read value from DS:SI into AL
+            "movb %%al, %0 \n"             // Store AL in the output variable
+            "popw %%ds \n"                 // Restore the original DS register
+            : "=r" (value)                 // Output operand
+            : "r" (segment), "r" (offset)  // Input operands
+            : "ax", "al", "si", "memory"   // Clobbered registers
+        );
+        return value;
+    }
+
+    operator uint8_t() const {
+        return read(); 
+    }
+    
+    // Overload assignment operator to assign from another FarProxy
+    FarProxy &operator=(const FarProxy &other) {
+        *this = other.read(); // Use `read()` to fetch the value from `other`
+        return *this;
+    }
+
 };
 
 // FarPointer class for array-like access to far memory
