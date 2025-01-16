@@ -16,7 +16,7 @@ rem Assemble the bootloader
 "c:\program files\nasm\nasm.exe" -f bin boot.asm -o %OUT_DIR%\boot.bin
 
 rem Compile the kernel (real mode C code)
-wsl gcc -fno-pie -m16 -c kernel.c -o %OUT_DIR%/kernel.o
+wsl g++ -ffreestanding -fno-pie -m16 -nodefaultlibs -fno-exceptions -c kernel.cpp -o %OUT_DIR%/kernel.o
 
 rem Link the kernel (include start.o)
 wsl ld -T linker.ld -m elf_i386 --oformat binary -o %OUT_DIR%/kernel.bin  %OUT_DIR%/kernel.o
