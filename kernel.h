@@ -12,6 +12,7 @@ static inline void set_es_segment(uint16_t segment) {
 }
 
 // Proxy class for accessing far pointer memory
+template <typename T = uint8_t>
 class FarProxy {
 private:
     uint16_t segment; // Segment part of the far pointer
@@ -22,7 +23,7 @@ public:
     FarProxy(uint16_t seg, uint16_t ofs) : segment(seg), offset(ofs) {}
 
     // Write to the memory location
-    FarProxy &operator=(uint8_t value) {
+    FarProxy &operator=(T value) {
         set_es_segment(segment);
         asm volatile (
             "movb %0, %%al \n"             // Load value into AL
@@ -35,8 +36,9 @@ public:
         return *this;
     }
 
-    uint8_t read() const {
-        char value;
+    // Read from memory
+    T read() const {
+        T value;
         //set_es_segment(segment);
         asm volatile (
             "pushw %%ds \n"                // Save the 16-bit DS register on the stack
@@ -53,19 +55,26 @@ public:
         return value;
     }
 
-    operator uint8_t() const {
-        return read(); 
+    // Implicit conversion to T
+    operator T() const {
+        return read();
     }
+
     
-    // Overload assignment operator to assign from another FarProxy
     FarProxy &operator=(const FarProxy &other) {
         *this = other.read(); // Use `read()` to fetch the value from `other`
+        return *this;
+    }
+    template <typename U>
+    FarProxy &operator=(const FarProxy<U> &other) {
+        *this = static_cast<T>(other.read());
         return *this;
     }
 
 };
 
 // FarPointer class for array-like access to far memory
+template <typename T = uint8_t>
 class FarPointer {
 private:
     uint16_t segment; // Segment portion of the far pointer
@@ -76,7 +85,7 @@ public:
     FarPointer(uint16_t seg, uint16_t ofs) : segment(seg), offset(ofs) {}
 
     // Overload operator[] for array-style access
-    FarProxy operator[](size_t index) const {
-        return FarProxy(segment, offset + index);
+    FarProxy<T> operator[](size_t index) const {
+        return FarProxy<T>(segment, offset + index * sizeof(T));
     }
 };
