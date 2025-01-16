@@ -14,12 +14,12 @@ start:
     xor ax, ax
     mov ds, ax
 
-    ; Load the address of the string into SI
-    mov si, boot_message
-    call print_string
+    ; ; Load the address of the string into SI
+    ; mov si, boot_message
+    ; call print_string
 
-    mov si, loading_message
-    call print_string
+    ; mov si, loading_message
+    ; call print_string
 
     ; call debug_fill_memory
     
@@ -40,19 +40,19 @@ start:
     jc load_failed    ; If carry flag is set, loading failed
 
 
-    mov si, kernel_message
-    call print_string
+    ; mov si, kernel_message
+    ; call print_string
 
 
-    ;(memory segment is ES, offset is DI)
-    mov ax, 0x0000      ; Set ES to 0x0000
-    mov es, ax
-    mov di, KERNEL_LOAD_ADDR  ; Start at offset 
-    mov cx, 16         ; Print 256 bytes
-    call print_memory    ; Call debug print routine
+    ; ;(memory segment is ES, offset is DI)
+    ; mov ax, 0x0000      ; Set ES to 0x0000
+    ; mov es, ax
+    ; mov di, KERNEL_LOAD_ADDR  ; Start at offset 
+    ; mov cx, 16         ; Print 256 bytes
+    ; call print_memory    ; Call debug print routine
 
-    mov si, new_line
-    call print_string
+    ; mov si, new_line
+    ; call print_string
 
     ; -- Jump to the kernel --
     call KERNEL_LOAD_ADDR   
@@ -66,22 +66,22 @@ load_failed:
     jmp halt          ; Hang the system (halt)
 
 halt:
-    mov si, halt_message
-    call print_string
+    ; mov si, halt_message
+    ; call print_string
 
     ; Infinite loop to halt the CPU
     cli
     hlt
     jmp halt
 
-boot_message db 'Hello from boot.asm :)', 0Dh, 0Ah, 0;
-loading_message db 'Loading kernel.c ...', 0Dh, 0Ah, 0;
-kernel_message db 'Kernel loaded, now jumping .. first 16 bytes of kernel below ...', 0Dh, 0Ah, 0;
+; boot_message db 'Hello from boot.asm :)', 0Dh, 0Ah, 0;
+; loading_message db 'Loading kernel.c ...', 0Dh, 0Ah, 0;
+; kernel_message db 'Kernel loaded, now jumping .. first 16 bytes of kernel below ...', 0Dh, 0Ah, 0;
 error_message db 'Error in boot.asm :(', 0Dh, 0Ah, 0;
-halt_message db 'Halting </end>', 0Dh, 0Ah, 0;
-new_line db 0Dh, 0Ah, 0;
+; halt_message db 'Halting </end>', 0Dh, 0Ah, 0;
+; new_line db 0Dh, 0Ah, 0;
 
-%include "debug.asm"
+%include "boot/debug.asm"
 
     
 times 510-($-$$) db 0

@@ -3,19 +3,19 @@
 
 ## Overview
 
-`bboot` is a simple bootloader that prints "Hello, World!" to the screen when the system starts. This project demonstrates the basics of bootloader development, including setting up the environment, writing assembly code, and creating a bootable image.
+`bboot` is an example 16 bit real-mode bootloader that prints some text to the screen, and also beeps when the system starts. This project demonstrates the basics of bootloader development, including setting up the environment, writing assembly code, and creating a bootable image.
 
 ## Features
 
-- Initializes video mode to 80x25 text mode
-- Prints "Hello, World!" to the screen
-- Loads a kernel from disk and jumps to it
+- MBR style booting
+- FarPointer implemention
+- PC Speaker beep
 
 ## Requirements
 
-- NASM (Netwide Assembler)
-- QEMU (for testing)
-- A Windows environment (for building the bootable image)
+- NASM 
+- g++
+- Windows / wsl (although should be buildable on Linux, I just have a build.bat that assumes Windows)
 
 ## Getting Started
 
@@ -23,8 +23,7 @@
 
 Ensure you have the following tools installed on your system:
 
-- NASM: [NASM Download](https://www.nasm.us/)
-- QEMU: [QEMU Download](https://www.qemu.org/)
+- NASM: [NASM Download](https://www.nasm.us/) in C:\Program Files\NASM
 
 ### Building the Bootloader
 
@@ -41,29 +40,10 @@ Ensure you have the following tools installed on your system:
 
 ### Running the Bootloader
 
-You can test the bootloader using QEMU:
+You can test the bootloader using QEMU, and it's also tested in 86Box, HyperV, and VirtualBox as floppy device.
 
 ```sh
-qemu-system-x86_64 -fda floppy.img
+qemu-system-x86_64 -fda out\floppy.img
 ```
 
-You should see the message "Hello, World!" printed on the screen.
-
-### Files
-
-- `boot.asm`: The main assembly file containing the bootloader code.
-- `build.bat`: Batch script to assemble the bootloader and create a bootable image.
-- `README.md`: This file, providing an overview and instructions.
-
-## Contributing
-
-Feel free to open issues or submit pull requests if you have any suggestions or improvements.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
-## Acknowledgements
-
-- Inspired by the resources available on [OSDev Wiki](https://wiki.osdev.org)
-- Based on tutorials from "The Little Book About OS Development" ([https://littleosbook.github.io/](https://littleosbook.github.io/))
+You should see the bootloader code print on the screen.

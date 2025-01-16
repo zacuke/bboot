@@ -1,6 +1,7 @@
 #include <cstdint>
-#include "kernel.h"
-#include "sound.h"
+ 
+#include "lib/farpointer.c"
+#include "lib/sound.c"
 
 extern "C" void kernel_main() __attribute__((section(".text.kernel_main")));
 
@@ -8,15 +9,18 @@ extern "C" void kernel_main() __attribute__((section(".text.kernel_main")));
 extern "C" void kernel_main() {
     FarPointer vram(0xB800, 0x0000); // VGA text mode memory starts at 0xB800:0x0000
     
-    vram[10] = vram[0]; 
-    vram[12] = vram[0].read();
-   
-    vram[0] = 'X';  // Write ASCII 'X' to col 0
-    vram[1] = 0x07; // Light gray text on black
+    vram[0] = 'H';
+    vram[1] = 0x0E; // Yellow
     
-    vram[2] = 'Y';  // Write ASCII 'Y' to col 1
-    vram[3] = 0x0E; // Yellow text on black
+    vram[2] = 'i';
+    vram[3] = 0x0E; // Yellow 
 
+    vram[4] = '!';
+    vram[5] = 0x0E; // Yellow 
+
+    //vram[10] = vram[0]; 
+    //vram[12] = vram[0].read();
+   
     beep(440, 500);
        
 }

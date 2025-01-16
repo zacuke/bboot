@@ -13,7 +13,7 @@ if exist %OUT_DIR% (
 mkdir %OUT_DIR%
 
 rem Copy boot.asm into the out directory for modification
-copy boot.asm %OUT_DIR%\boot_with_sectors.asm
+copy boot\boot.asm %OUT_DIR%\boot_with_sectors.asm
 
 rem Compile the kernel (real mode C code)
 wsl g++ -ffreestanding -fno-pie -m16 -nodefaultlibs -fno-exceptions -c kernel.cpp -o %OUT_DIR%/kernel.o
@@ -22,7 +22,7 @@ rem Link the kernel (include start.o)
 wsl ld -T linker.ld -m elf_i386 --oformat binary -e kernel_main -o %OUT_DIR%/kernel.bin %OUT_DIR%/kernel.o
 
 rem Call WSL to calculate kernel sectors and modify the bootloader copy in the out directory
-wsl bash modify_boot.sh %OUT_DIR%
+wsl bash boot/modify_boot.sh %OUT_DIR%
 
 rem Assemble the modified bootloader
 "c:\program files\nasm\nasm.exe" -f bin %OUT_DIR%\boot_with_sectors.asm -o %OUT_DIR%\boot.bin
