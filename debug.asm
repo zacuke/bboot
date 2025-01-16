@@ -1,3 +1,30 @@
+
+debug_fill_memory:
+    pusha  
+    ; -- Fill memory with static data (all 0xFF's) --
+    mov bx, 0x1000    ; Set ES to the target segment 0x1000
+    mov es, bx        ; ES = 0x1000
+
+    xor di, di        ; Offset starts at 0x0000
+    mov cx, 256       ; Number of bytes to write (adjust as needed)
+    mov al, 0xFF      ; Value to write  
+
+    .fill_memory:
+        stosb          ; Store AL at ES:[DI], increment DI
+        loop .fill_memory ; Repeat CX times
+
+    ; Debug: Read and display the contents of memory at 0x1000:0000
+    mov bx, 0x1000      ; Segment where kernel is loaded
+    mov es, bx          ; Set ES to that segment
+    xor di, di          ; Offset in segment starts at 0x0000
+    mov cx, 256         ; Number of bytes to read/display (adjust as needed)
+    call print_memory    ; Jump to the memory printing subroutine
+
+    mov si, new_line
+    call print_string
+    popa
+    ret   
+
 print_string:
     ; Print characters until null terminator
     pusha               ; Save all registers (optional, for safety)
