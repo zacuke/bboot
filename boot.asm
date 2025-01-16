@@ -27,7 +27,7 @@ start:
     mov bx, 0x7e00    ; ES:BX = Target address for kernel
  
     mov ah, 0x02      ; BIOS function 0x02: Read sectors into memory
-    mov al, 1         ; Number of sectors to read (adjust as needed)
+    mov al, 2         ; Number of sectors to read (adjust as needed)
     mov ch, 0         ; Cylinder 0
     mov dh, 0         ; Head 0
     mov cl, 2        ; Read from sector 2 (after bootloader)
