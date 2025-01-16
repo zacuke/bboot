@@ -1,68 +1,27 @@
 
-debug_fill_memory:
-    pusha  
-    ; -- Fill memory with static data (all 0xFF's) --
-    mov bx, 0x1000    ; Set ES to the target segment 0x1000
-    mov es, bx        ; ES = 0x1000
-
-    xor di, di        ; Offset starts at 0x0000
-    mov cx, 256       ; Number of bytes to write (adjust as needed)
-    mov al, 0xFF      ; Value to write  
-
-    .fill_memory:
-        stosb          ; Store AL at ES:[DI], increment DI
-        loop .fill_memory ; Repeat CX times
-
-    ; Debug: Read and display the contents of memory at 0x1000:0000
-    mov bx, 0x1000      ; Segment where kernel is loaded
-    mov es, bx          ; Set ES to that segment
-    xor di, di          ; Offset in segment starts at 0x0000
-    mov cx, 256         ; Number of bytes to read/display (adjust as needed)
-    call print_memory    ; Jump to the memory printing subroutine
-
-    mov si, new_line
-    call print_string
-    popa
-    ret   
-
-print_string:
-    ; Print characters until null terminator
-    pusha               ; Save all registers (optional, for safety)
-
-.print_char:
-    lodsb               ; Load byte at [SI] into AL
-    or al, al           ; Check if AL is zero (end of string)
-    jz .done            ; If zero, go to function end
-    mov ah, 0x0E        ; Teletype output function
-    int 0x10            ; BIOS interrupt
-    jmp .print_char     ; Repeat for next character
-
-.done:
-    popa                ; Restore all registers (optional, if pusha was used)
-    ret                 ; Return to the caller
 
 print_memory:
     pusha               ; Save all registers
-
 .memory_loop:
-    ; Load byte from ES:[DI] into AL (memory segment is ES, offset is DI)
+    ; Load a byte from memory segment ES:[DI] into AL
     mov al, es:[di]
-    ; Convert the byte in AL to hexadecimal string and print it
+    
+    ; Convert the byte in AL to hexadecimal format and display
     call print_hex_byte
 
-    ; Print a space between bytes for readability
+    ; Print a space for readability
     mov ah, 0x0E
-    mov al, ' '
+    mov al, ' '             ; Space character
     int 0x10
 
-    ; Increment DI to move to the next byte
+    ; Increment the offset (DI) to move to the next byte
     inc di
 
-    ; Decrement CX, stop when all bytes printed
+    ; Decrement loop counter (CX), continue if CX > 0
     loop .memory_loop
 
-    popa                ; Restore all registers
-    ret                 ; Return to caller
+    popa                    ; Restore all registers
+    ret                     ; Return to caller
 
 print_hex_byte:
     push ax             ; Save the value in AX (because AL contains the byte to print)
@@ -93,3 +52,20 @@ print_hex_nibble:
     mov ah, 0x0E        ; BIOS teletype function to print a character
     int 0x10            ; Print the character in AL
     ret                 ; Return to caller
+
+ 
+print_string:
+    ; Print characters until null terminator
+    pusha               ; Save all registers (optional, for safety)
+
+.print_char:
+    lodsb               ; Load byte at [SI] into AL
+    or al, al           ; Check if AL is zero (end of string)
+    jz .done            ; If zero, go to function end
+    mov ah, 0x0E        ; Teletype output function
+    int 0x10            ; BIOS interrupt
+    jmp .print_char     ; Repeat for next character
+
+.done:
+    popa                ; Restore all registers (optional, if pusha was used)
+    ret                 ; Return to the caller
