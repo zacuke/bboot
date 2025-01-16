@@ -12,16 +12,21 @@ if exist %OUT_DIR% (
 )
 mkdir %OUT_DIR%
 
-rem Assemble the bootloader
-"c:\program files\nasm\nasm.exe" -f bin boot.asm -o %OUT_DIR%\boot.bin
+rem Copy boot.asm into the out directory for modification
+copy boot.asm %OUT_DIR%\boot_with_sectors.asm
 
 rem Compile the kernel (real mode C code)
 wsl g++ -ffreestanding -fno-pie -m16 -nodefaultlibs -fno-exceptions -c kernel.cpp -o %OUT_DIR%/kernel.o
 
 rem Link the kernel (include start.o)
-wsl ld -T linker.ld -m elf_i386 --oformat binary -e kernel_main -o %OUT_DIR%/kernel.bin  %OUT_DIR%/kernel.o
+wsl ld -T linker.ld -m elf_i386 --oformat binary -e kernel_main -o %OUT_DIR%/kernel.bin %OUT_DIR%/kernel.o
 
-rem Create a bootable image
+rem Call WSL to calculate kernel sectors and modify the bootloader copy in the out directory
+wsl bash modify_boot.sh %OUT_DIR%
+
+rem Assemble the modified bootloader
+"c:\program files\nasm\nasm.exe" -f bin %OUT_DIR%\boot_with_sectors.asm -o %OUT_DIR%\boot.bin
+
 copy /b %OUT_DIR%\boot.bin + %OUT_DIR%\kernel.bin %OUT_DIR%\os-image.bin
 
 rem Create a floppy image

@@ -1,3 +1,6 @@
+%define KERNEL_LOAD_ADDR 0x7E00
+%define KERNEL_SECTORS 1
+
 BITS 16
 ORG 0x7C00
 
@@ -24,10 +27,10 @@ start:
     xor bx, bx    
     mov es, bx    ; es should be 0
 
-    mov bx, 0x7e00    ; ES:BX = Target address for kernel
+    mov bx, KERNEL_LOAD_ADDR    ; ES:BX = Target address for kernel
  
     mov ah, 0x02      ; BIOS function 0x02: Read sectors into memory
-    mov al, 6         ; Number of sectors to read (adjust as needed)
+    mov al, KERNEL_SECTORS  ; Number of sectors to read (adjust as needed)
     mov ch, 0         ; Cylinder 0
     mov dh, 0         ; Head 0
     mov cl, 2        ; Read from sector 2 (after bootloader)
@@ -44,18 +47,17 @@ start:
     ;(memory segment is ES, offset is DI)
     mov ax, 0x0000      ; Set ES to 0x0000
     mov es, ax
-    mov di, 0x7e00      ; Start at offset 0x7E00
+    mov di, KERNEL_LOAD_ADDR  ; Start at offset 
     mov cx, 16         ; Print 256 bytes
     call print_memory    ; Call debug print routine
 
     mov si, new_line
     call print_string
 
-
     ; -- Jump to the kernel --
-    jmp 0x7e00   
-    
+    call KERNEL_LOAD_ADDR   
     jmp halt
+ 
 
 load_failed:
     ; -- Display error message if kernel loading fails --

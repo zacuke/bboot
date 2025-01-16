@@ -1,7 +1,6 @@
 ENTRY(kernel_main)
 
 SECTIONS {
-    /* Place kernel code starting at 0x1000 (adjust as needed) */
     . = 0x7e00;
 
     /* Text (code) section */
